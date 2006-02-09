@@ -1,6 +1,13 @@
 @INCLUDES = epetraext/doc/TagFiles
 @INCLUDES = amesos/doc/TagFiles
 #
+# Override some options from Doxyfile.options
+#
+EXTRACT_ALL            = YES
+EXTRACT_PRIVATE        = YES
+EXTRACT_STATIC         = YES
+EXTRACT_LOCAL_CLASSES  = YES
+#
 # Package options
 #
 PROJECT_NAME           = "MOOCHO (Single Doxygen Collection)"
