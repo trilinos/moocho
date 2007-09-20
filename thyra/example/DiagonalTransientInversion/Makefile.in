@@ -42,10 +42,6 @@
 # ************************************************************************
 # @HEADER
 
-#
-# Build the external example for users to see how to do this.
-#
-
 # ************************************************************************
 # 
 # Moocho: Multi-functional Object-Oriented arCHitecture for Optimization
@@ -97,10 +93,10 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 target_triplet = @target@
-noinst_PROGRAMS = ExampleNLPBanded$(EXEEXT)
+noinst_PROGRAMS = DiagonalTransientInversion$(EXEEXT)
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in \
 	$(top_srcdir)/MakefileExeStub.mak
-subdir = example/ExampleNLPBanded
+subdir = thyra/example/DiagonalTransientInversion
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/config/tac_arg_check_mpi.m4 \
 	$(top_srcdir)/config/tac_arg_config_mpi.m4 \
@@ -121,9 +117,11 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/config/mkinstalldirs
 CONFIG_HEADER = $(top_builddir)/src/Moocho_Config.h
 CONFIG_CLEAN_FILES =
 PROGRAMS = $(noinst_PROGRAMS)
-am_ExampleNLPBanded_OBJECTS = ExampleNLPBandedMain.$(OBJEXT) \
-	NLPInterfacePack_ExampleNLPBanded.$(OBJEXT)
-ExampleNLPBanded_OBJECTS = $(am_ExampleNLPBanded_OBJECTS)
+am__objects_1 = EpetraExt_DiagonalTransientModel.$(OBJEXT)
+am_DiagonalTransientInversion_OBJECTS = $(am__objects_1) \
+	DiagonalTransientInversionMain.$(OBJEXT)
+DiagonalTransientInversion_OBJECTS =  \
+	$(am_DiagonalTransientInversion_OBJECTS)
 am__DEPENDENCIES_1 =
 DEFAULT_INCLUDES = -I. -I$(top_builddir)/src@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
@@ -133,20 +131,10 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
-SOURCES = $(ExampleNLPBanded_SOURCES)
-DIST_SOURCES = $(ExampleNLPBanded_SOURCES)
-RECURSIVE_TARGETS = all-recursive check-recursive dvi-recursive \
-	html-recursive info-recursive install-data-recursive \
-	install-dvi-recursive install-exec-recursive \
-	install-html-recursive install-info-recursive \
-	install-pdf-recursive install-ps-recursive install-recursive \
-	installcheck-recursive installdirs-recursive pdf-recursive \
-	ps-recursive uninstall-recursive
-RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
-  distclean-recursive maintainer-clean-recursive
+SOURCES = $(DiagonalTransientInversion_SOURCES)
+DIST_SOURCES = $(DiagonalTransientInversion_SOURCES)
 ETAGS = etags
 CTAGS = ctags
-DIST_SUBDIRS = external
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 ALTERNATE_AR = @ALTERNATE_AR@
@@ -158,7 +146,12 @@ AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
 CFLAGS = @CFLAGS@
-CPPFLAGS = @CPPFLAGS@
+
+#
+# General options
+#
+CPPFLAGS = @CPPFLAGS@ \
+	-I$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient
 CXX = @CXX@
 CXXCPP = @CXXCPP@
 CXXDEPMODE = @CXXDEPMODE@
@@ -264,14 +257,24 @@ target_os = @target_os@
 target_vendor = @target_vendor@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-@USING_EXPORT_MAKEFILES_TRUE@EXTERNAL_MAKEFILE_EXAMPLE = external
-SUBDIRS = $(EXTERNAL_MAKEFILE_EXAMPLE)
-ExampleNLPBanded_SOURCES = \
-  $(srcdir)/ExampleNLPBandedMain.cpp\
-  $(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp
+DiagonalTransientInversion_SOURCES = \
+  $(common_sources) \
+  $(srcdir)/DiagonalTransientInversionMain.cpp
 
-ExampleNLPBanded_DEPENDENCIES = $(common_dependencies)
-ExampleNLPBanded_LDADD = $(common_ldadd)
+DiagonalTransientInversion_DEPENDENCIES = $(common_dependencies)
+DiagonalTransientInversion_LDADD = $(common_ldadd)
+
+#
+# Input files
+#
+DIAGONAL_INPUT_FILES = \
+  MoochoDiagTransInvSmall.opt \
+  diagTransInvSmall_1.xml \
+  MoochoDiagTransInvMedium.opt \
+  diagTransInvMedium.xml \
+  MoochoDiagTransInvBdfVariable.opt \
+  diagTransInvBdfVariable.xml
+
 @ENABLE_MOOCHO_THYRA_TRUE@MOOCHO_THYRA_LIB = $(top_builddir)/thyra/src/libmoochothyra.a
 common_dependencies = \
   $(top_builddir)/src/libmoocho.a \
@@ -285,8 +288,22 @@ _EXPORT_LIBS = $(MOOCHO_LIBS) $(RYTHMOS_LIBS) $(STRATIMIKOS_LIBS) $(EPETRAEXT_LI
 @USING_GNUMAKE_FALSE@EXPORT_LIBS = $(_EXPORT_LIBS)
 AM_CPPFLAGS = $(EXPORT_INCLUDES)
 common_ldadd = $(EXPORT_LIBS)
-EXTRA_DIST = $(srcdir)/NLPInterfacePack_ExampleNLPBanded.hpp
-all: all-recursive
+common_sources = \
+  $(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp
+
+
+#
+# All extra files that have to be added to the tarball!
+#
+EXTRA_DIST = \
+  _MoochoDiagTransInvSmall.opt \
+  _diagTransInvSmall_1.xml \
+  _MoochoDiagTransInvMedium.opt \
+  _diagTransInvMedium.xml \
+  _MoochoDiagTransInvBdfVariable.opt \
+  _diagTransInvBdfVariable.xml
+
+all: all-am
 
 .SUFFIXES:
 .SUFFIXES: .cpp .o .obj
@@ -299,9 +316,9 @@ $(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(top_srcdir
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  example/ExampleNLPBanded/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --foreign  thyra/example/DiagonalTransientInversion/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --foreign  example/ExampleNLPBanded/Makefile
+	  $(AUTOMAKE) --foreign  thyra/example/DiagonalTransientInversion/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -322,9 +339,9 @@ $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
 
 clean-noinstPROGRAMS:
 	-test -z "$(noinst_PROGRAMS)" || rm -f $(noinst_PROGRAMS)
-ExampleNLPBanded$(EXEEXT): $(ExampleNLPBanded_OBJECTS) $(ExampleNLPBanded_DEPENDENCIES) 
-	@rm -f ExampleNLPBanded$(EXEEXT)
-	$(CXXLINK) $(ExampleNLPBanded_OBJECTS) $(ExampleNLPBanded_LDADD) $(LIBS)
+DiagonalTransientInversion$(EXEEXT): $(DiagonalTransientInversion_OBJECTS) $(DiagonalTransientInversion_DEPENDENCIES) 
+	@rm -f DiagonalTransientInversion$(EXEEXT)
+	$(CXXLINK) $(DiagonalTransientInversion_OBJECTS) $(DiagonalTransientInversion_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -332,8 +349,8 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ExampleNLPBandedMain.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NLPInterfacePack_ExampleNLPBanded.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/DiagonalTransientInversionMain.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/EpetraExt_DiagonalTransientModel.Po@am__quote@
 
 .cpp.o:
 @am__fastdepCXX_TRUE@	$(CXXCOMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -349,103 +366,33 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 
-ExampleNLPBandedMain.o: $(srcdir)/ExampleNLPBandedMain.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ExampleNLPBandedMain.o -MD -MP -MF $(DEPDIR)/ExampleNLPBandedMain.Tpo -c -o ExampleNLPBandedMain.o `test -f '$(srcdir)/ExampleNLPBandedMain.cpp' || echo '$(srcdir)/'`$(srcdir)/ExampleNLPBandedMain.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/ExampleNLPBandedMain.Tpo $(DEPDIR)/ExampleNLPBandedMain.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(srcdir)/ExampleNLPBandedMain.cpp' object='ExampleNLPBandedMain.o' libtool=no @AMDEPBACKSLASH@
+EpetraExt_DiagonalTransientModel.o: $(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT EpetraExt_DiagonalTransientModel.o -MD -MP -MF $(DEPDIR)/EpetraExt_DiagonalTransientModel.Tpo -c -o EpetraExt_DiagonalTransientModel.o `test -f '$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp' || echo '$(srcdir)/'`$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/EpetraExt_DiagonalTransientModel.Tpo $(DEPDIR)/EpetraExt_DiagonalTransientModel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp' object='EpetraExt_DiagonalTransientModel.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ExampleNLPBandedMain.o `test -f '$(srcdir)/ExampleNLPBandedMain.cpp' || echo '$(srcdir)/'`$(srcdir)/ExampleNLPBandedMain.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o EpetraExt_DiagonalTransientModel.o `test -f '$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp' || echo '$(srcdir)/'`$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp
 
-ExampleNLPBandedMain.obj: $(srcdir)/ExampleNLPBandedMain.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT ExampleNLPBandedMain.obj -MD -MP -MF $(DEPDIR)/ExampleNLPBandedMain.Tpo -c -o ExampleNLPBandedMain.obj `if test -f '$(srcdir)/ExampleNLPBandedMain.cpp'; then $(CYGPATH_W) '$(srcdir)/ExampleNLPBandedMain.cpp'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/ExampleNLPBandedMain.cpp'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/ExampleNLPBandedMain.Tpo $(DEPDIR)/ExampleNLPBandedMain.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(srcdir)/ExampleNLPBandedMain.cpp' object='ExampleNLPBandedMain.obj' libtool=no @AMDEPBACKSLASH@
+EpetraExt_DiagonalTransientModel.obj: $(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT EpetraExt_DiagonalTransientModel.obj -MD -MP -MF $(DEPDIR)/EpetraExt_DiagonalTransientModel.Tpo -c -o EpetraExt_DiagonalTransientModel.obj `if test -f '$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp'; then $(CYGPATH_W) '$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/EpetraExt_DiagonalTransientModel.Tpo $(DEPDIR)/EpetraExt_DiagonalTransientModel.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp' object='EpetraExt_DiagonalTransientModel.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o ExampleNLPBandedMain.obj `if test -f '$(srcdir)/ExampleNLPBandedMain.cpp'; then $(CYGPATH_W) '$(srcdir)/ExampleNLPBandedMain.cpp'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/ExampleNLPBandedMain.cpp'; fi`
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o EpetraExt_DiagonalTransientModel.obj `if test -f '$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp'; then $(CYGPATH_W) '$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalTransient/EpetraExt_DiagonalTransientModel.cpp'; fi`
 
-NLPInterfacePack_ExampleNLPBanded.o: $(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT NLPInterfacePack_ExampleNLPBanded.o -MD -MP -MF $(DEPDIR)/NLPInterfacePack_ExampleNLPBanded.Tpo -c -o NLPInterfacePack_ExampleNLPBanded.o `test -f '$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp' || echo '$(srcdir)/'`$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/NLPInterfacePack_ExampleNLPBanded.Tpo $(DEPDIR)/NLPInterfacePack_ExampleNLPBanded.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp' object='NLPInterfacePack_ExampleNLPBanded.o' libtool=no @AMDEPBACKSLASH@
+DiagonalTransientInversionMain.o: $(srcdir)/DiagonalTransientInversionMain.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT DiagonalTransientInversionMain.o -MD -MP -MF $(DEPDIR)/DiagonalTransientInversionMain.Tpo -c -o DiagonalTransientInversionMain.o `test -f '$(srcdir)/DiagonalTransientInversionMain.cpp' || echo '$(srcdir)/'`$(srcdir)/DiagonalTransientInversionMain.cpp
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/DiagonalTransientInversionMain.Tpo $(DEPDIR)/DiagonalTransientInversionMain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(srcdir)/DiagonalTransientInversionMain.cpp' object='DiagonalTransientInversionMain.o' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o NLPInterfacePack_ExampleNLPBanded.o `test -f '$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp' || echo '$(srcdir)/'`$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o DiagonalTransientInversionMain.o `test -f '$(srcdir)/DiagonalTransientInversionMain.cpp' || echo '$(srcdir)/'`$(srcdir)/DiagonalTransientInversionMain.cpp
 
-NLPInterfacePack_ExampleNLPBanded.obj: $(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp
-@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT NLPInterfacePack_ExampleNLPBanded.obj -MD -MP -MF $(DEPDIR)/NLPInterfacePack_ExampleNLPBanded.Tpo -c -o NLPInterfacePack_ExampleNLPBanded.obj `if test -f '$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp'; then $(CYGPATH_W) '$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp'; fi`
-@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/NLPInterfacePack_ExampleNLPBanded.Tpo $(DEPDIR)/NLPInterfacePack_ExampleNLPBanded.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp' object='NLPInterfacePack_ExampleNLPBanded.obj' libtool=no @AMDEPBACKSLASH@
+DiagonalTransientInversionMain.obj: $(srcdir)/DiagonalTransientInversionMain.cpp
+@am__fastdepCXX_TRUE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT DiagonalTransientInversionMain.obj -MD -MP -MF $(DEPDIR)/DiagonalTransientInversionMain.Tpo -c -o DiagonalTransientInversionMain.obj `if test -f '$(srcdir)/DiagonalTransientInversionMain.cpp'; then $(CYGPATH_W) '$(srcdir)/DiagonalTransientInversionMain.cpp'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/DiagonalTransientInversionMain.cpp'; fi`
+@am__fastdepCXX_TRUE@	mv -f $(DEPDIR)/DiagonalTransientInversionMain.Tpo $(DEPDIR)/DiagonalTransientInversionMain.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='$(srcdir)/DiagonalTransientInversionMain.cpp' object='DiagonalTransientInversionMain.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o NLPInterfacePack_ExampleNLPBanded.obj `if test -f '$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp'; then $(CYGPATH_W) '$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/NLPInterfacePack_ExampleNLPBanded.cpp'; fi`
-
-# This directory's subdirectories are mostly independent; you can cd
-# into them and run `make' without going through this Makefile.
-# To change the values of `make' variables: instead of editing Makefiles,
-# (1) if the variable is set in `config.status', edit `config.status'
-#     (which will cause the Makefiles to be regenerated when you run `make');
-# (2) otherwise, pass the desired values on the `make' command line.
-$(RECURSIVE_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	target=`echo $@ | sed s/-recursive//`; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    dot_seen=yes; \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done; \
-	if test "$$dot_seen" = "no"; then \
-	  $(MAKE) $(AM_MAKEFLAGS) "$$target-am" || exit 1; \
-	fi; test -z "$$fail"
-
-$(RECURSIVE_CLEAN_TARGETS):
-	@failcom='exit 1'; \
-	for f in x $$MAKEFLAGS; do \
-	  case $$f in \
-	    *=* | --[!k]*);; \
-	    *k*) failcom='fail=yes';; \
-	  esac; \
-	done; \
-	dot_seen=no; \
-	case "$@" in \
-	  distclean-* | maintainer-clean-*) list='$(DIST_SUBDIRS)' ;; \
-	  *) list='$(SUBDIRS)' ;; \
-	esac; \
-	rev=''; for subdir in $$list; do \
-	  if test "$$subdir" = "."; then :; else \
-	    rev="$$subdir $$rev"; \
-	  fi; \
-	done; \
-	rev="$$rev ."; \
-	target=`echo $@ | sed s/-recursive//`; \
-	for subdir in $$rev; do \
-	  echo "Making $$target in $$subdir"; \
-	  if test "$$subdir" = "."; then \
-	    local_target="$$target-am"; \
-	  else \
-	    local_target="$$target"; \
-	  fi; \
-	  (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) $$local_target) \
-	  || eval $$failcom; \
-	done && test -z "$$fail"
-tags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) tags); \
-	done
-ctags-recursive:
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  test "$$subdir" = . || (cd $$subdir && $(MAKE) $(AM_MAKEFLAGS) ctags); \
-	done
+@am__fastdepCXX_FALSE@	$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o DiagonalTransientInversionMain.obj `if test -f '$(srcdir)/DiagonalTransientInversionMain.cpp'; then $(CYGPATH_W) '$(srcdir)/DiagonalTransientInversionMain.cpp'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/DiagonalTransientInversionMain.cpp'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -457,23 +404,10 @@ ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	mkid -fID $$unique
 tags: TAGS
 
-TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+TAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
-	if ($(ETAGS) --etags-include --version) >/dev/null 2>&1; then \
-	  include_option=--etags-include; \
-	  empty_fix=.; \
-	else \
-	  include_option=--include; \
-	  empty_fix=; \
-	fi; \
-	list='$(SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test ! -f $$subdir/TAGS || \
-	      tags="$$tags $$include_option=$$here/$$subdir/TAGS"; \
-	  fi; \
-	done; \
 	list='$(SOURCES) $(HEADERS)  $(LISP) $(TAGS_FILES)'; \
 	unique=`for i in $$list; do \
 	    if test -f "$$i"; then echo $$i; else echo $(srcdir)/$$i; fi; \
@@ -486,7 +420,7 @@ TAGS: tags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 	    $$tags $$unique; \
 	fi
 ctags: CTAGS
-CTAGS: ctags-recursive $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
+CTAGS:  $(HEADERS) $(SOURCES)  $(TAGS_DEPENDENCIES) \
 		$(TAGS_FILES) $(LISP)
 	tags=; \
 	here=`pwd`; \
@@ -534,37 +468,19 @@ distdir: $(DISTFILES)
 	    || exit 1; \
 	  fi; \
 	done
-	list='$(DIST_SUBDIRS)'; for subdir in $$list; do \
-	  if test "$$subdir" = .; then :; else \
-	    test -d "$(distdir)/$$subdir" \
-	    || $(MKDIR_P) "$(distdir)/$$subdir" \
-	    || exit 1; \
-	    distdir=`$(am__cd) $(distdir) && pwd`; \
-	    top_distdir=`$(am__cd) $(top_distdir) && pwd`; \
-	    (cd $$subdir && \
-	      $(MAKE) $(AM_MAKEFLAGS) \
-	        top_distdir="$$top_distdir" \
-	        distdir="$$distdir/$$subdir" \
-		am__remove_distdir=: \
-		am__skip_length_check=: \
-	        distdir) \
-	      || exit 1; \
-	  fi; \
-	done
 check-am: all-am
-check: check-recursive
-all-am: Makefile $(PROGRAMS)
-installdirs: installdirs-recursive
-installdirs-am:
-install: install-recursive
-install-exec: install-exec-recursive
-install-data: install-data-recursive
-uninstall: uninstall-recursive
+check: check-am
+all-am: Makefile $(PROGRAMS) all-local
+installdirs:
+install: install-am
+install-exec: install-exec-am
+install-data: install-data-am
+uninstall: uninstall-am
 
 install-am: all-am
 	@$(MAKE) $(AM_MAKEFLAGS) install-exec-am install-data-am
 
-installcheck: installcheck-recursive
+installcheck: installcheck-am
 install-strip:
 	$(MAKE) $(AM_MAKEFLAGS) INSTALL_PROGRAM="$(INSTALL_STRIP_PROGRAM)" \
 	  install_sh_PROGRAM="$(INSTALL_STRIP_PROGRAM)" INSTALL_STRIP_FLAG=-s \
@@ -580,80 +496,101 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean: clean-recursive
+clean: clean-am
 
 clean-am: clean-generic clean-noinstPROGRAMS mostlyclean-am
 
-distclean: distclean-recursive
+distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
 
-dvi: dvi-recursive
+dvi: dvi-am
 
 dvi-am:
 
-html: html-recursive
+html: html-am
 
-info: info-recursive
+info: info-am
 
 info-am:
 
 install-data-am:
 
-install-dvi: install-dvi-recursive
+install-dvi: install-dvi-am
 
 install-exec-am:
 
-install-html: install-html-recursive
+install-html: install-html-am
 
-install-info: install-info-recursive
+install-info: install-info-am
 
 install-man:
 
-install-pdf: install-pdf-recursive
+install-pdf: install-pdf-am
 
-install-ps: install-ps-recursive
+install-ps: install-ps-am
 
 installcheck-am:
 
-maintainer-clean: maintainer-clean-recursive
+maintainer-clean: maintainer-clean-am
 	-rm -rf ./$(DEPDIR)
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
-mostlyclean: mostlyclean-recursive
+mostlyclean: mostlyclean-am
 
 mostlyclean-am: mostlyclean-compile mostlyclean-generic
 
-pdf: pdf-recursive
+pdf: pdf-am
 
 pdf-am:
 
-ps: ps-recursive
+ps: ps-am
 
 ps-am:
 
 uninstall-am:
 
-.MAKE: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) install-am \
-	install-strip
+.MAKE: install-am install-strip
 
-.PHONY: $(RECURSIVE_CLEAN_TARGETS) $(RECURSIVE_TARGETS) CTAGS GTAGS \
-	all all-am check check-am clean clean-generic \
-	clean-noinstPROGRAMS ctags ctags-recursive distclean \
+.PHONY: CTAGS GTAGS all all-am all-local check check-am clean \
+	clean-generic clean-noinstPROGRAMS ctags distclean \
 	distclean-compile distclean-generic distclean-tags distdir dvi \
 	dvi-am html html-am info info-am install install-am \
 	install-data install-data-am install-dvi install-dvi-am \
 	install-exec install-exec-am install-html install-html-am \
 	install-info install-info-am install-man install-pdf \
 	install-pdf-am install-ps install-ps-am install-strip \
-	installcheck installcheck-am installdirs installdirs-am \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-compile mostlyclean-generic pdf pdf-am ps ps-am \
-	tags tags-recursive uninstall uninstall-am
+	installcheck installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-compile \
+	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
+	uninstall-am
 
+
+all-local: $(DIAGONAL_INPUT_FILES)
+	@echo ""
+	@echo "moocho/thyra/example/DiagonalTransientInversion built successfully."
+	@echo ""
+
+MoochoDiagTransInvSmall.opt: $(srcdir)/_MoochoDiagTransInvSmall.opt
+	cp $< $@
+
+diagTransInvSmall_1.xml: $(srcdir)/_diagTransInvSmall_1.xml
+	cp $< $@
+
+MoochoDiagTransInvMedium.opt: $(srcdir)/_MoochoDiagTransInvMedium.opt
+	cp $< $@
+
+diagTransInvMedium.xml: $(srcdir)/_diagTransInvMedium.xml
+	cp $< $@
+
+MoochoDiagTransInvBdfVariable.opt: $(srcdir)/_MoochoDiagTransInvBdfVariable.opt
+	cp $< $@
+
+diagTransInvBdfVariable.xml: $(srcdir)/_diagTransInvBdfVariable.xml
+	cp $< $@
 
 include $(top_builddir)/Makefile.export.moocho
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
