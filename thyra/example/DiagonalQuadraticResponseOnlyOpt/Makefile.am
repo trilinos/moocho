@@ -26,26 +26,21 @@
 # ************************************************************************
 # @HEADER
 
-all-local: generate-sample-output.pl
-	@echo ""
-	@echo "Trilinos package moocho subdirectory thyra/example built successfully."
-	@echo ""
+#
+# Build the actual test program in the build directory so that
+# we can test this.
+#
 
-generate-sample-output.pl : generate-sample-output.pl.stub
-	cp generate-sample-output.pl.stub generate-sample-output.pl
-	chmod a+x generate-sample-output.pl
-
-if ENABLE_MOOCHO_STRATIMIKOS
-if ENABLE_THYRA_EPETRAEXT
-MOOCHO_STRATIMIKOS_EXAMPLES = \
-  NLPThyraEpetraModelEval4DOpt \
-  NLPThyraEpetraAdvDiffReactOpt \
+noinst_PROGRAMS = \
   DiagonalQuadraticResponseOnlyOpt
-endif
-if ENABLE_MOOCHO_RYTHMOS
-MOOCHO_RYTHMOS_EXAMPLES = \
-  DiagonalTransientInversion
-endif
-endif
 
-SUBDIRS = $(MOOCHO_STRATIMIKOS_EXAMPLES) $(MOOCHO_RYTHMOS_EXAMPLES)
+DiagonalQuadraticResponseOnlyOpt_SOURCES = \
+  $(top_srcdir)/../epetraext/example/model_evaluator/DiagonalQuadraticResponseOnlyOpt/EpetraExt_DiagonalQuadraticResponseOnlyModelEvaluator.cpp\
+  $(srcdir)/DiagonalQuadraticResponseOnlyOptMain.cpp
+
+DiagonalQuadraticResponseOnlyOpt_DEPENDENCIES = $(common_dependencies)
+DiagonalQuadraticResponseOnlyOpt_LDADD = $(common_ldadd)
+
+include $(top_srcdir)/MakefileExeStub.mak
+
+CPPFLAGS += -I$(top_srcdir)/../epetraext/example/model_evaluator/DiagonalQuadraticResponseOnlyOpt
