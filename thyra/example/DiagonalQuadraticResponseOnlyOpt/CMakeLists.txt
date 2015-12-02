@@ -5,8 +5,11 @@
 #
 
 
-SET(EPETRAEXT_DQROO_DIR
-  ${PACKAGE_SOURCE_DIR}/../epetraext/example/model_evaluator/DiagonalQuadraticResponseOnlyOpt)
+GET_FILENAME_COMPONENT(EPETRAEXT_DQROO_DIR
+  ${PACKAGE_SOURCE_DIR}/../epetraext/example/model_evaluator/DiagonalQuadraticResponseOnlyOpt
+  ABSOLUTE
+)
+
 
 SET(THYRA_DQROME_DIR
   thyra/core/test/nonlinear/models)

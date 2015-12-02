@@ -1,8 +1,9 @@
 
 
-SET(EPETRAEXT_DT_DIR
-  ${PACKAGE_SOURCE_DIR}/../epetraext/example/model_evaluator/DiagonalTransient)
-
+GET_FILENAME_COMPONENT(EPETRAEXT_DT_DIR
+  ${PACKAGE_SOURCE_DIR}/../epetraext/example/model_evaluator/DiagonalTransient
+  ABSOLUTE
+)
 
 TRIBITS_INCLUDE_DIRECTORIES(REQUIRED_DURING_INSTALLATION_TESTING ${EPETRAEXT_DT_DIR})
 
